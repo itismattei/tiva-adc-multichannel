@@ -5,11 +5,15 @@
 #include <stdint.h>
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
+#include "inc/hw_ints.h"
+#include "inc/hw_adc.h"
 #include "driverlib/adc.h"
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/adc.h"
 #include "driverlib/debug.h"
+#include "driverlib/interrupt.h"
+#include "driverlib/rom.h"
 
 /*main(void) {
 
@@ -44,8 +48,18 @@
 }
 */
 
+
+uint32_t adc0buffer[8];
+
+void adcISR(void){
+
+	ADCIntClear(ADC0_BASE, 2);
+	ADCSequenceDataGet(ADC0_BASE, 2, adc0buffer);    // Read ADC Value.
+	HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
+}
+
 void main(){
-	uint32_t adc0buffer[8],adc1buffer[8];
+	uint32_t adc1buffer[8];
 	volatile uint32_t ch0data, ch1data;
 	//int i,Average0,ch0data0,ch0data1,ch0data2,ch0data3,Average1,ch1data0,ch1data1,ch1data2,ch1data3;
 	SysCtlClockSet(SYSCTL_SYSDIV_10|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//20Mhz clock
@@ -102,14 +116,27 @@ GrContextFontSet(&sContext, &g_sFontCmsc20);
 GrStringDraw(&sContext, "ADC Value:" , -1, 5, 22, 0);
 GrStringDraw(&sContext, "ADC Value:" , -1, 5, 52, 0);
 GrFlush(&sContext);*/
+
+    //
+    // Enable the ADC interrupt.
+    //
+    ROM_IntEnable(INT_ADC0SS2);
+    ADCIntEnable(ADC0_BASE, 2);
+    //
+    // Enable processor interrupts.
+    //
+    ROM_IntMasterEnable();
+
+
 	while(1){
 		ADCIntClear(ADC0_BASE, 2);
 		// Trigger the ADC conversion on sequencer 2
-		ADCProcessorTrigger(ADC0_BASE, 2);
+		//ADCProcessorTrigger(ADC0_BASE, 2);
+		HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
 		/// polling
 		while(!ADCIntStatus(ADC0_BASE, 2, false)){}        // Wait for conversion to be completed.
 		ADCIntClear(ADC0_BASE, 2);                        // Clear the ADC interrupt flag.
-		ADCSequenceDataGet(ADC0_BASE, 2, adc0buffer);    // Read ADC Value.
+		for(;;);
 		//ch2data = adcbuffer[0];
 		//ch3data = adcbuffer[1];
 		//ch8data = adcbuffer[2];
