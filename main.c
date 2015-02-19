@@ -141,7 +141,7 @@ void main(){
 //ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
 //ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
 	/// PE.2
-	ADCSequenceStepConfigure(ADC0_BASE, 2, 0, ADC_CTL_CH1);
+	//ADCSequenceStepConfigure(ADC0_BASE, 2, 0, ADC_CTL_CH1);
 	/// legge nell'ordine il canale 2,il 3 e il n.8
 
 	/// PE.0
@@ -157,25 +157,11 @@ void main(){
 	                                     ~(0x0000000f << 0)) | (((ADC_CTL_CH3 & 0xf0) >> 4) << 0));
 
 	HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2 + ADC_SSOP) &= ~(1 << 0);
+
 	// PE.1
-
-	/// PE.1
-
 	ADCSequenceStepConfigure(ADC0_BASE, 2, 1, ADC_CTL_CH2);
-
-	// PE.2
-	//ADCSequenceStepConfigure(ADC0_BASE, 2, 2, ADC_CTL_CH1);
-
-	ADCSequenceStepConfigure(ADC0_BASE, 2, 0, ADC_CTL_CH2);
-
-	// PE.0
-
-	ADCSequenceStepConfigure(ADC0_BASE, 2, 2, ADC_CTL_CH3);
-
-	ADCSequenceStepConfigure(ADC0_BASE, 2, 1, ADC_CTL_CH3);
-
 	/// PE.5
-	ADCSequenceStepConfigure(ADC0_BASE, 2, 3, ADC_CTL_CH8 | ADC_CTL_IE | ADC_CTL_END);
+	ADCSequenceStepConfigure(ADC0_BASE, 2, 2, ADC_CTL_CH8 | ADC_CTL_IE | ADC_CTL_END);
 /*ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH0);
 ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH0);
 ADCSequenceStepConfigure(ADC0_BASE, 0, 2, ADC_CTL_CH0);
