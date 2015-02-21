@@ -106,14 +106,15 @@ uint32_t adc0buffer[12];
 volatile uint32_t numByte;
 
 void adcISR(void){
-
+	volatile uint32_t attesa;
 	ADCIntClear(ADC0_BASE, 0);
 	numByte = ADCSequenceData_Get(ADC0_BASE, 0, adc0buffer);    // Read ADC Value.
 	/// riavvia il campionamento
 	//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
-	//HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
+	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
 	ADCProcessorTrigger(ADC0_BASE, 0);
-	//HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) |=  GPIO_PIN_0;
+	for(attesa = 0; attesa < 1000; attesa++);
+	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) |=  GPIO_PIN_0;
 }
 
 void main(){
