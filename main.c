@@ -7,13 +7,16 @@
 #include "inc/hw_types.h"
 #include "inc/hw_ints.h"
 #include "inc/hw_adc.h"
+#include "inc/hw_gpio.h"
 #include "driverlib/adc.h"
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/adc.h"
 #include "driverlib/debug.h"
 #include "driverlib/interrupt.h"
+#include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
+
 
 #define ADC_SEQ                 (ADC_O_SSMUX0)
 #define ADC_SEQ_STEP            (ADC_O_SSMUX1 - ADC_O_SSMUX0)
@@ -108,7 +111,9 @@ void adcISR(void){
 	numByte = ADCSequenceData_Get(ADC0_BASE, 0, adc0buffer);    // Read ADC Value.
 	/// riavvia il campionamento
 	//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
+	//HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
 	ADCProcessorTrigger(ADC0_BASE, 0);
+	//HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) |=  GPIO_PIN_0;
 }
 
 void main(){
@@ -116,6 +121,28 @@ void main(){
 	volatile uint32_t ch0data, ch1data;
 	//int i,Average0,ch0data0,ch0data1,ch0data2,ch0data3,Average1,ch1data0,ch1data1,ch1data2,ch1data3;
 	SysCtlClockSet(SYSCTL_SYSDIV_10|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);//20Mhz clock
+
+	//setup PB0 per scopi di debug
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+	/// PB0 in uscita
+	HWREG(GPIO_PORTB_BASE + GPIO_O_DIR) 	|= GPIO_PIN_0;
+	/// no alternate function
+	HWREG(GPIO_PORTB_BASE + GPIO_O_AFSEL) 	&= ~GPIO_PIN_0;
+	/// 2 ma di corrente
+	HWREG(GPIO_PORTB_BASE + GPIO_O_DR2R)	|= GPIO_PIN_0;
+	/// controllo slew rate off
+	HWREG(GPIO_PORTB_BASE + GPIO_O_SLR)		&= ~GPIO_PIN_0;
+	/// pull up
+	//HWREG(GPIO_PORTF_BASE + GPIO_O_PUR)		|= GPIO_PIN_4;
+	/// abilitazione della funzione digitale
+	HWREG(GPIO_PORTB_BASE + GPIO_O_DEN)		|= GPIO_PIN_0;
+	/// imposta il pin (ricordare lo shift di 2 posizione verso sinistra della maschera di bit
+	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) |=  GPIO_PIN_0;
+	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
+
+
+
+
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 //SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
