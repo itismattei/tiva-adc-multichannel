@@ -79,7 +79,7 @@ int32_t ADCSequenceData_Get(uint32_t ui32Base, uint32_t ui32SequenceNum, uint32_
     //
     ui32Count = 0;
     while(!(HWREG(ui32Base + ADC_SSFSTAT) & ADC_SSFSTAT0_EMPTY) &&
-          (ui32Count < 8))
+          (ui32Count < 10))
     {
         //
         // Read the FIFO and copy it to the destination.
@@ -167,9 +167,9 @@ void main(){
 	ADCSequenceStepConfigure(ADC0_BASE, 0, 2, ADC_CTL_CH2 );
 	//GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_0); //Ain3
 	// PE.0
-	ADCSequenceStepConfigure(ADC0_BASE, 0, 3, ADC_CTL_CH3 );
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 3, ADC_CTL_CH8 );
 	/// PE.5
-	ADCSequenceStepConfigure(ADC0_BASE, 0, 4, ADC_CTL_CH8 | ADC_CTL_IE | ADC_CTL_END);
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 4, ADC_CTL_CH3 | ADC_CTL_IE | ADC_CTL_END);
 /*ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH0);
 ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH0);
 ADCSequenceStepConfigure(ADC0_BASE, 0, 2, ADC_CTL_CH0);
