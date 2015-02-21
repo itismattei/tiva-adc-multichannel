@@ -104,10 +104,11 @@ volatile uint32_t numByte;
 
 void adcISR(void){
 
-	ADCIntClear(ADC0_BASE, 2);
-	numByte = ADCSequenceData_Get(ADC0_BASE, 2, adc0buffer);    // Read ADC Value.
+	ADCIntClear(ADC0_BASE, 1);
+	numByte = ADCSequenceData_Get(ADC0_BASE, 1, adc0buffer);    // Read ADC Value.
 	/// riavvia il campionamento
-	HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
+	//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
+	ADCProcessorTrigger(ADC0_BASE, 1);
 }
 
 void main(){
@@ -126,18 +127,18 @@ void main(){
 	GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_0); //Ain3
 	GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_5); //Ain8
 	/// imposta il sequencer 1, che ha 4 letture
-	//ADCSequenceConfigure(ADC0_BASE, 2, ADC_TRIGGER_PROCESSOR, 0);
+	ADCSequenceConfigure(ADC0_BASE, 1, ADC_TRIGGER_PROCESSOR, 0);
 	//
 	// Set the trigger event for this sample sequence.
 	//
-	HWREG(ADC0_BASE + ADC_O_EMUX) = ((HWREG(ADC0_BASE + ADC_O_EMUX) &
+	/*HWREG(ADC0_BASE + ADC_O_EMUX) = ((HWREG(ADC0_BASE + ADC_O_EMUX) &
 									 ~(0xf << (2*4))) |
 									((0 & 0xf) << (2*4)));
 
 	/// imposta la priorità
 	HWREG(ADC0_BASE + ADC_O_SSPRI) = ((HWREG(ADC0_BASE + ADC_O_SSPRI) &
 	                                      ~(0xf << (2*4))) |
-	                                     ((0 & 0x3) << (2*4)));
+	                                     ((0 & 0x3) << (2*4)));*/
 //ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
 //ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
 	/// PE.2
@@ -145,9 +146,9 @@ void main(){
 	/// legge nell'ordine il canale 2,il 3 e il n.8
 
 	/// PE.0
-	//ADCSequenceStepConfigure(ADC0_BASE, 2, 0, ADC_CTL_CH3);
+	//ADCSequenceStepConfigure(ADC0_BASE, 1, 0, ADC_CTL_CH3);
 	/// scrive il numero del canale all'interno dei 4 bit del mux0 del registro ADCSSMUX2
-	HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2 + ADC_SSMUX) = ((HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2 + ADC_SSMUX) &
+	/*HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2 + ADC_SSMUX) = ((HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2 + ADC_SSMUX) &
 	                                    ~(0x0000000f << 0)) | ((ADC_CTL_CH3 & 0x0f) << 0));
 
 	HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2 + ADC_SSEMUX) = ((HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2 + ADC_SSEMUX) &
@@ -156,12 +157,16 @@ void main(){
 	HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2  + ADC_SSCTL) = ((HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2  + ADC_SSCTL) &
 	                                     ~(0x0000000f << 0)) | (((ADC_CTL_CH3 & 0xf0) >> 4) << 0));
 
-	HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2 + ADC_SSOP) &= ~(1 << 0);
+	HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2 + ADC_SSOP) &= ~(1 << 0);*/
+	/// PE.3
+	ADCSequenceStepConfigure(ADC0_BASE, 1, 0, ADC_CTL_CH1);
+	/// PE.2
+	ADCSequenceStepConfigure(ADC0_BASE, 1, 1, ADC_CTL_CH0);
 
 	// PE.1
-	ADCSequenceStepConfigure(ADC0_BASE, 2, 1, ADC_CTL_CH2);
+	ADCSequenceStepConfigure(ADC0_BASE, 1, 2, ADC_CTL_CH2 );
 	/// PE.5
-	ADCSequenceStepConfigure(ADC0_BASE, 2, 2, ADC_CTL_CH8 | ADC_CTL_IE | ADC_CTL_END);
+	ADCSequenceStepConfigure(ADC0_BASE, 1, 3, ADC_CTL_CH8 | ADC_CTL_IE | ADC_CTL_END);
 /*ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH0);
 ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH0);
 ADCSequenceStepConfigure(ADC0_BASE, 0, 2, ADC_CTL_CH0);
@@ -178,16 +183,16 @@ ADCSequenceStepConfigure(ADC1_BASE, 0, 4, ADC_CTL_CH1);
 ADCSequenceStepConfigure(ADC1_BASE, 0, 5, ADC_CTL_CH1);
 ADCSequenceStepConfigure(ADC1_BASE, 0, 6, ADC_CTL_CH1);
 ADCSequenceStepConfigure(ADC1_BASE, 0, 7, ADC_CTL_CH1 | ADC_CTL_IE | ADC_CTL_END);*/
-	/// abilita il sequencer 2
-	//ADCSequenceEnable(ADC0_BASE, 2);
+	/// abilita il sequencer 1
+	ADCSequenceEnable(ADC0_BASE, 1);
 	//
 	// Enable the specified sequence.
 	//
-	HWREG(ADC0_BASE + ADC_O_ACTSS) |= 1 << 2;
+	//HWREG(ADC0_BASE + ADC_O_ACTSS) |= 1 << 2;
 //ADCSequenceEnable(ADC0_BASE, 0);
 //ADCSequenceEnable(ADC1_BASE, 0);
 	/// abilta l'interruzione del sequencer2
-	ADCIntClear(ADC0_BASE, 2);
+	ADCIntClear(ADC0_BASE, 1);
 //ADCIntClear(ADC0_BASE, 0);
 //ADCIntClear(ADC1_BASE, 0);
 /*Kentec320x240x16_SSD2119Init();
@@ -202,8 +207,8 @@ GrFlush(&sContext);*/
     //
     // Enable the ADC interrupt.
     //
-    ROM_IntEnable(INT_ADC0SS2);
-    ADCIntEnable(ADC0_BASE, 2);
+    ROM_IntEnable(INT_ADC0SS1);
+    ADCIntEnable(ADC0_BASE, 1);
     //
     // Enable processor interrupts.
     //
@@ -211,13 +216,13 @@ GrFlush(&sContext);*/
 
 
 	while(1){
-		ADCIntClear(ADC0_BASE, 2);
+		ADCIntClear(ADC0_BASE, 1);
 		// Trigger the ADC conversion on sequencer 2
-		//ADCProcessorTrigger(ADC0_BASE, 2);
-		HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
+		ADCProcessorTrigger(ADC0_BASE, 1);
+		//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
 		/// polling
-		while(!ADCIntStatus(ADC0_BASE, 2, false)){}        // Wait for conversion to be completed.
-		ADCIntClear(ADC0_BASE, 2);                        // Clear the ADC interrupt flag.
+		while(!ADCIntStatus(ADC0_BASE, 1, false)){}        // Wait for conversion to be completed.
+		ADCIntClear(ADC0_BASE, 1);                        // Clear the ADC interrupt flag.
 		for(;;);
 		//ch2data = adcbuffer[0];
 		//ch3data = adcbuffer[1];
