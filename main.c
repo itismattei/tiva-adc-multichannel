@@ -99,16 +99,16 @@ int32_t ADCSequenceData_Get(uint32_t ui32Base, uint32_t ui32SequenceNum, uint32_
 }
 
 
-uint32_t adc0buffer[8];
+uint32_t adc0buffer[12];
 volatile uint32_t numByte;
 
 void adcISR(void){
 
-	ADCIntClear(ADC0_BASE, 1);
-	numByte = ADCSequenceData_Get(ADC0_BASE, 1, adc0buffer);    // Read ADC Value.
+	ADCIntClear(ADC0_BASE, 0);
+	numByte = ADCSequenceData_Get(ADC0_BASE, 0, adc0buffer);    // Read ADC Value.
 	/// riavvia il campionamento
 	//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
-	ADCProcessorTrigger(ADC0_BASE, 1);
+	ADCProcessorTrigger(ADC0_BASE, 0);
 }
 
 void main(){
