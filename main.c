@@ -147,13 +147,14 @@ void main(){
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 //SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
 	ADCReferenceSet(ADC0_BASE, ADC_REF_INT); //Set reference to the internal reference ,You can set it to 1V or 3 V
 //ADCReferenceSet(ADC1_BASE, ADC_REF_INT);
 	GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_3); //Ain0
 	GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_2); //Ain1
 	GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_1); //Ain2
 	GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_0); //Ain3
-	GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_5); //Ain8
+	GPIOPinTypeADC(GPIO_PORTD_BASE, GPIO_PIN_3); //Ain4
 	/// imposta il sequencer 0, che ha 8 letture
 	ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
 	//
@@ -187,17 +188,17 @@ void main(){
 
 	HWREG(ADC0_BASE + 0x40 + (0x60 - 0x40)*2 + ADC_SSOP) &= ~(1 << 0);*/
 	/// PE.3
-	ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH1);
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH0);
 	/// PE.2
-	ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH0);
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH1);
 
 	// PE.1
-	ADCSequenceStepConfigure(ADC0_BASE, 0, 2, ADC_CTL_CH2 );
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 2, ADC_CTL_CH3 );
 	//GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_0); //Ain3
 	// PE.0
-	ADCSequenceStepConfigure(ADC0_BASE, 0, 3, ADC_CTL_CH8 );
-	/// PE.5
-	ADCSequenceStepConfigure(ADC0_BASE, 0, 4, ADC_CTL_CH3 | ADC_CTL_IE | ADC_CTL_END);
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 3, ADC_CTL_CH3 );
+	/// PD.3
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 4, ADC_CTL_CH4 | ADC_CTL_IE | ADC_CTL_END);
 /*ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH0);
 ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH0);
 ADCSequenceStepConfigure(ADC0_BASE, 0, 2, ADC_CTL_CH0);
