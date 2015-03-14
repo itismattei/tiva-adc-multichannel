@@ -16,6 +16,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
+#include "dist.h"
 
 
 #define ADC_SEQ                 (ADC_O_SSMUX0)
@@ -102,13 +103,13 @@ int32_t ADCSequenceData_Get(uint32_t ui32Base, uint32_t ui32SequenceNum, uint32_
 }
 
 
-uint32_t adc0buffer[12];
+distanza D;
 volatile uint32_t numByte;
 
 void adcISR(void){
 	volatile uint32_t attesa;
 	ADCIntClear(ADC0_BASE, 0);
-	numByte = ADCSequenceData_Get(ADC0_BASE, 0, adc0buffer);    // Read ADC Value.
+	numByte = ADCSequenceData_Get(ADC0_BASE, 0, D.dI);    // Read ADC Value.
 	/// riavvia il campionamento
 	//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
 	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
