@@ -37,6 +37,48 @@ void console_init(void);
 #define ADC_SSOP                (ADC_O_SSOP0 - ADC_O_SSMUX0)
 #define ADC_SSDC                (ADC_O_SSDC0 - ADC_O_SSMUX0)
 
+#define		UART0			0
+#define		UART1			1
+
+
+void console_init(void)
+{
+	ConfigureUART(115200, UART0);
+    //
+    // Enable the peripherals used by this example.
+    //
+	/*ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+
+    //
+    // Set GPIO A0 and A1 as UART pins.
+    //
+	ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
+	ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
+	ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+	ROM_GPIOPinConfigure(GPIO_PB0_U1RX);
+	ROM_GPIOPinConfigure(GPIO_PB1_U1TX);
+	ROM_GPIOPinTypeUART(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+	//
+	// Use the internal 16MHz oscillator as the UART clock source.
+	ROM_UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
+
+	//
+    // Configure the UART for 115,200, 8-N-1 operation.
+	ROM_UARTConfigSetExpClk(UART1_BASE, ROM_SysCtlClockGet(), 115200,
+                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                             UART_CONFIG_PAR_NONE));
+
+	ROM_UARTConfigSetExpClk(UART0_BASE, ROM_SysCtlClockGet(), 115200,
+                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                             UART_CONFIG_PAR_NONE));
+*/
+}
 
 
 int32_t ADCSequenceData_Get(uint32_t ui32Base, uint32_t ui32SequenceNum, uint32_t *pui32Buffer){
@@ -92,10 +134,9 @@ void adcISR(void){
 	//ADCProcessorTrigger(ADC0_BASE, 0);
 	for(attesa = 0; attesa < 1000; attesa++);
 	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) |=  GPIO_PIN_0;
-	for(attesa= 0; attesa<6; attesa++)
-	{
-		PRINTF("%d \t", D.dI[attesa]);
-	}
+	for(attesa= 0; attesa < 5; attesa++)
+		PRINTF("val: %d \t", D.dI[attesa]);
+
 	PRINTF("\n");
 }
 
@@ -111,7 +152,7 @@ void main(){
 
 	console_init();
 
-	initTimer0();
+
 
 	uint32_t adc1buffer[8];
 	volatile uint32_t ch0data, ch1data;
@@ -169,6 +210,10 @@ void main(){
 	/// abilita il sequencer 0
 	ADCSequenceEnable(ADC0_BASE, 0);
 
+	/// messaggio di benvenuto
+	PRINTF("Ciao: stai provando il converntitore AD!\n");
+
+	initTimer0();
 	//ABILITAZIONE INTERRUZIONI//
 
 	/// abilta l'interruzione del sequencer 0
@@ -176,12 +221,13 @@ void main(){
     //
     // Enable the ADC interrupt.
     //
-    ROM_IntEnable(INT_ADC0SS0);
+    IntEnable(INT_ADC0SS0);
     ADCIntEnable(ADC0_BASE, 0);
     //
     // Enable processor interrupts.
     //
-    ROM_IntMasterEnable();
+    IntMasterEnable();
+
 
 	while(1){
 
@@ -192,36 +238,3 @@ void main(){
 
 
 
-void console_init(void)
-{
-    //
-    // Enable the peripherals used by this example.
-    //
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-
-    //
-    // Set GPIO A0 and A1 as UART pins.
-    //
-	ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
-	ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
-	ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-	ROM_GPIOPinConfigure(GPIO_PB0_U1RX);
-	ROM_GPIOPinConfigure(GPIO_PB1_U1TX);
-	ROM_GPIOPinTypeUART(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-	//
-    // Configure the UART for 115,200, 8-N-1 operation.
-    //
-	ROM_UARTConfigSetExpClk(UART1_BASE, ROM_SysCtlClockGet(), 115200,
-                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                             UART_CONFIG_PAR_NONE));
-
-	ROM_UARTConfigSetExpClk(UART0_BASE, ROM_SysCtlClockGet(), 115200,
-                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                             UART_CONFIG_PAR_NONE));
-}
