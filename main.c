@@ -41,43 +41,9 @@ void console_init(void);
 #define		UART1			1
 
 
-void console_init(void)
-{
+void console_init(void){
 	ConfigureUART(115200, UART0);
-    //
-    // Enable the peripherals used by this example.
-    //
-	/*ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-
-    //
-    // Set GPIO A0 and A1 as UART pins.
-    //
-	ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
-	ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
-	ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-	ROM_GPIOPinConfigure(GPIO_PB0_U1RX);
-	ROM_GPIOPinConfigure(GPIO_PB1_U1TX);
-	ROM_GPIOPinTypeUART(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-	//
-	// Use the internal 16MHz oscillator as the UART clock source.
-	ROM_UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
-
-	//
-    // Configure the UART for 115,200, 8-N-1 operation.
-	ROM_UARTConfigSetExpClk(UART1_BASE, ROM_SysCtlClockGet(), 115200,
-                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                             UART_CONFIG_PAR_NONE));
-
-	ROM_UARTConfigSetExpClk(UART0_BASE, ROM_SysCtlClockGet(), 115200,
-                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                             UART_CONFIG_PAR_NONE));
-*/
 }
 
 
