@@ -1,5 +1,8 @@
 /*
  * main.c
+ *
+ *  verifica il funzionamento dei 5 sensori di distanza e stampa su termite le letture
+ *
  */
 #include <stdbool.h>
 #include <stdint.h>
